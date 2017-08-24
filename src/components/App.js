@@ -1,19 +1,14 @@
 import React, { Component } from 'react';
-import './App.css';
 import {
-  Collapse,
-  Navbar,
-  NavbarToggler,
-  NavbarBrand,
-  Nav,
-  NavItem,
-  NavLink,
-  Container,
-  Row,
-  Col,
   Jumbotron,
-  Button
+  Button,
+  ListGroup,
+  ListGroupItem
 } from 'reactstrap';
+
+import Header from './Header';
+import Sidebar from './Sidebar';
+import * as api from '../utils/api';
 
 class App extends Component {
 
@@ -22,32 +17,43 @@ class App extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.state = {
-      isOpen: false
+      isOpen: false,
+      categories: [],
     };
   }
+
+  componentDidMount() {
+    this.getCategories();
+  }
+
   toggle() {
     this.setState({
       isOpen: !this.state.isOpen
     });
   }
 
+  getCategories = () => {
+    api.fetchCategories().then((response) => {
+      console.log(response.categories);
+
+      if (response.categories) {
+        console.log('setting state');
+        this.setState(() => ({
+          categories: response.categories
+        }))
+      }
+    })
+  }
+
   render() {
+    const categories = this.state.categories;
+
     return (
       <div>
-        <Navbar color="inverse" inverse toggleable>
-          <NavbarToggler right onClick={this.toggle} />
-          <NavbarBrand href="/">reactstrap</NavbarBrand>
-          <Collapse isOpen={this.state.isOpen} navbar>
-            <Nav className="ml-auto" navbar>
-              <NavItem>
-                <NavLink href="/components/">Components</NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink href="https://github.com/reactstrap/reactstrap">Github</NavLink>
-              </NavItem>
-            </Nav>
-          </Collapse>
-        </Navbar>
+        <Header></Header>
+        <div className='app-body'>
+          <Sidebar {...this.props}/>
+        </div>
         <Jumbotron>
           <h1 className="display-3">Hello, world!</h1>
           <p className="lead">This is a simple hero unit, a simple Jumbotron-style component for calling extra attention to featured content or information.</p>
@@ -56,7 +62,16 @@ class App extends Component {
           <p className="lead">
             <Button color="primary">Learn More</Button>
           </p>
+
+          <ListGroup>
+            { categories.map((category) => (
+              <ListGroupItem key={category.name} tag="a" href="#">
+                {category.name}
+              </ListGroupItem>
+            ))}
+          </ListGroup>
         </Jumbotron>
+
       </div>
     );
   }
