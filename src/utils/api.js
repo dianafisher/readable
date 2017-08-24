@@ -18,3 +18,23 @@ export function fetchCategories () {
       console.log('error' + error);
     })
 }
+
+export function fetchPosts () {
+  console.log('fetching all posts 🐩')
+  return fetch(`${api}/posts`, { headers })
+    .then(res => res.json())
+    .catch(error => {
+      console.log('error' + error);
+    })
+}
+
+export const addPost = (post) => {
+  fetch(`{api}/posts`, {
+    method: 'POST',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ post })
+  }).then(res => res.json())
+}
